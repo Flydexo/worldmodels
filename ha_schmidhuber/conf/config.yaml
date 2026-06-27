@@ -1,10 +1,11 @@
 trackio:
     write_url: ??
     project: 'ha_schmidhuber'
-    run_name: 'test'
+    run_name: 'test-1'
 dataset:
     episodes: 100
     lancedb_uri: 'db'
 training:
     nb_epochs: 1
     lr: 0.001
+device: 'mps'

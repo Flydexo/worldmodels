@@ -12,15 +12,16 @@ class PrintShape(nn.Module):
         return x
 
 class Dense(nn.Module):
-    def __init__(self):
+    def __init__(self, cfg):
         super().__init__()
         self.mu = nn.Linear(1024, 32)
         self.std = nn.Linear(1024, 32)
+        self.cfg = cfg
 
     def forward(self, x):
         distribution = Normal(torch.zeros(x.shape[0], 32), torch.ones(x.shape[0], 32))
         x = x.flatten(start_dim=1)
-        return self.mu(x) + self.std(x)*distribution.sample()
+        return self.mu(x) + self.std(x)*distribution.sample().to(self.cfg.device)
 
 
 class Fit(nn.Module):
@@ -42,7 +43,7 @@ class AutoEncoder(nn.Module):
             nn.ReLU(),
             nn.Conv2d(128, 256, 4, 2),
             nn.ReLU(),
-            Dense(),
+            Dense(cfg),
         )
         self.decoder = nn.Sequential(
             nn.Linear(32, 1024),
