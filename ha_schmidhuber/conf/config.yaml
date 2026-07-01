@@ -1,7 +1,7 @@
 trackio:
     write_url: ??
     project: 'ha_schmidhuber'
-    run_name: '<10k'
+    run_name: '10k-beta-0.0001'
 dataset:
     episodes: 10000
     lancedb_uri: 'db'
@@ -22,4 +22,9 @@ rnn:
     z_dim: 32
     action_dim: 3
     temp: 0.2
-device: 'mps'
+controller:
+    nb_rollouts: 100
+    state_dim: 32
+    hidden_dim: 256
+    action_dim: 3
+device: 'cpu'
