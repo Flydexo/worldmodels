@@ -392,6 +392,9 @@ def main():
     es = cma.CMAEvolutionStrategy(x0, args.sigma, opts)
     N = es.popsize
 
+    ckpt_dir = os.path.join(HERE, f"models/controller-{run}")
+    os.makedirs(ckpt_dir, exist_ok=True)
+
     pool = envs_ep = None
     if args.dream:
         print(f"DREAM  population={N}  avg={args.avg}  max_steps={max_steps}  device={device}")
@@ -445,6 +448,12 @@ def main():
                 torch.save(ctrl.state_dict(), os.path.join(HERE, f"models/controller-{run}.pt"))
 
             pbar.set_postfix(mean=f"{mean:.1f}", gen_best=f"{gen_best:.1f}", best=f"{best_ever:.1f}")
+            if (gen + 1) % 50 == 0:
+                ckpt_ctrl = Controller(cfg)
+                vector_to_parameters(torch.tensor(es.result.xbest, dtype=torch.float32), ckpt_ctrl.parameters())
+                torch.save({"gen": gen + 1, "best_ever": best_ever,
+                            "state_dict": ckpt_ctrl.state_dict()},
+                           os.path.join(ckpt_dir, f"checkpoint-{gen + 1}.pt"))
             if args.profile:
                 nroll = len(solutions) * args.avg
                 print(f"[profile] {nroll} rollouts in {dt:.1f}s = {nroll/dt:.1f} rollouts/s")
